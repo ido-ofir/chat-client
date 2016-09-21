@@ -16,17 +16,13 @@ This chat client is compliant and meant to be used with <a href="https://github.
 var ChatClient = require('chat-client');
 
 // a ChatClient instance is an extended native WebSocket.
-var chatClient = ChatClient({
-  url: 'ws://localhost:4001'
-});
+var chatClient = ChatClient({ url: 'ws://localhost:4001' });
 
 // wait for the socket to be opened.
 chatClient.whenOpened(()=>{
   
   // then try to get authorization from the chat server.
-  chatClient.authorize({
-    token: 123
-  }).then(()=>{
+  chatClient.authorize({ token: 123 }).then(()=>{
     
     // get some old messages
     chatClient.get({ limit: 10 }).then((chatMessages) => {
@@ -50,11 +46,13 @@ chatClient.whenOpened(()=>{
     });
     
     // create a new chat message.
-    chatClient.create({
+    var newMessage = {
       to: 'someUserId',
       type: 'text',
       value: 'Hi!'
-    }).then((msg) => {
+    };
+    
+    chatClient.create(newMesssage).then((msg) => {
     
       console.log('message sent');
       
