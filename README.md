@@ -47,7 +47,7 @@ chatClient.whenOpened(()=>{
     
     // create a new chat message.
     var newMessage = {
-      to: 'someUserId',
+      to: 'someUserId',   // 'to' is the only required property. the rest is up to you.
       type: 'text',
       value: 'Hi!'
     };
