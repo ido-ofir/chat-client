@@ -30,17 +30,23 @@ chatClient.whenOpened(()=>{
     
     // get some old messages
     chatClient.get({ limit: 10 }).then((chatMessages) => {
+    
       console.log('some old chat messages:', chatMessages);
+      
     }).catch((err)=>{
+    
       console.log('failed to get messages', err);
+      
     });
     
     // listen for incoming chat messages.
     chatClient.on('chatMessage', (msg)=>{
+    
       console.log('got message:', msg);
       
       // mark a message as having been read. 
       chatClient.read(msg._id).then(ok => /* ok */ ).catch(err => /* oops.. */ );
+      
     });
     
     // create a new chat message.
@@ -49,13 +55,19 @@ chatClient.whenOpened(()=>{
       type: 'text',
       value: 'Hi!'
     }).then((msg) => {
+    
       console.log('message sent');
+      
     }).catch((err) => {
+    
       console.log('failed to send message', err);
+      
     });
     
   }).catch(()=>{
+  
     console.log('authorization failed!');
+    
   });
   
 });
