@@ -95,13 +95,13 @@ When creating an instance of `ChatClient` you may pass an 'options' object to it
 * **connect** - (url: String) - connects the underlying socket to `url`.
 * **on** - (eventName: String, listener: Function) - binds `listener` to the `eventName` event.
 * **off** - (eventName: String, listener: Function) - unbinds `listener` to the `eventName` event. if `listener` is not provided, all listeners for `eventName` will be removed. if both `listener` and `eventName` are not provided, all listeners for all events will be removed.
-* **emit** - (eventName: String, ...args) - emit the `eventName` event. any additional argument will be passed to bound listeners.
+* **emit** - (eventName: String, ...args) - emit the `eventName` event. any additional arguments will be passed to bound listeners.
 * **run** - (type: String, data: Object) => Promise -  runs an action on the server. `type` is the name of the action on the server. `data` will be passed to the action on the server. a deffered promise is returned from this function. the promise will be resolved or rejected based on the server action's response.
 * **whenOpened** - (callback: Function) - runs `callback` whenever the socket opens. note that if the socket is already opened, `callback` will run immediately.
 * **authorize** - (data: Object) - runs the `authorize` action on the server, passing `data`.
 * **send** - (message: Object) - sends a chat message to the server. this will run the `create` action on the server, passing `data`.
 * **read** - (data: Object) - mark a chat message as having been read. this will run the `read` action on the server, passing `data`.
-* **error** - (err: any) - a default error handler which just log the error to the console. if you pass `onError` to the constructor it will override this function.
+* **error** - (err: any) - a default error handler which just logs the error to the console. if you pass `onError` to the constructor it will override this function.
 
 ## Events
 
