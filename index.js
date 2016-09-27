@@ -23,7 +23,7 @@ ChatClient.prototype = {
       if(chatClient.socket){
         chatClient.socket.close();
       }
-      var { actions, onOpen, onError, onMessage, onClose, log } = chatClient.options;
+      var { actions, onOpen, onError, onMessage, onClose } = chatClient.options;
       var socket = new WebSocket(url);
       chatClient.socket = socket;
       chatClient.url = url;
@@ -57,13 +57,8 @@ ChatClient.prototype = {
       socket.onmessage = function(msg){
 
         var json = JSON.parse(msg.data);
-        if(json.type) { // action was initiated by the server, run action if it exists in 'options.actions'.
-          if(actions && actions[json.type]){
-            actions[json.type](json.data);
-          }
-          else{   // if action does not exist, emit an event with the name of the action.
-            chatClient.emit(json.type, json.data);
-          }
+        if(json.type) { // emit an event with the name of the action.
+          chatClient.emit(json.type, json.data);
         }
         else {  // action was initiated by the client, return to the initiating callback.
           var requests = chatClient.requests;
@@ -81,7 +76,7 @@ ChatClient.prototype = {
           }
         }
         chatClient.emit('message', msg);  // in any case, emit a generic 'message' event.
-        
+
       };
 
     },
@@ -156,9 +151,9 @@ ChatClient.prototype = {
       return this.run('authorize', data);
 
     },
-    send(data) {
+    send(message) {
 
-      return this.run('create', data);
+      return this.run('create', message);
 
     },
     getMessages(data) {
