@@ -27,7 +27,7 @@ chatClient.connect('ws://localhost:4001');
 // wait for the socket to be opened.
 chatClient.whenOpened(()=>{
   
-  // then get authorization from the chat server.
+  // get authorization from the chat server.
   // the token here is just an example as the actual authorization protocol is completely up to you.
   chatClient.authorize({ token: 123 }).then(()=>{
     
@@ -79,6 +79,8 @@ chatClient.whenOpened(()=>{
 });
 
 ```
+
+## Options
 
 When creating an instance of `ChatClient` you may pass an 'options' object to it, containing some or all of the following fields:
 
