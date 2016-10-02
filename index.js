@@ -121,14 +121,14 @@ ChatClient.prototype = {
       return this;
 
     },
-    run(type, data){  // run an action on the server.
+    run(type, data, promise){  // run an action on the server.
 
       if(!data) {
         data = {};
       }
       this.id += 1;
       var request = { type: type, data: data, id: this.id };
-      var deffered = q.defer();
+      var deffered = promise || q.defer();
       var stringified = JSON.stringify(request);
 
       request.promise = deffered;
@@ -156,9 +156,9 @@ ChatClient.prototype = {
       return this.run('create', message);
 
     },
-    getMessages(data) {
+    getMessages(query) {
 
-      return this.run('getMessages', data);
+      return this.run('getMessages', query);
 
     },
     read(data) {
