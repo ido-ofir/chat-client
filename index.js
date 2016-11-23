@@ -7,7 +7,7 @@ function ChatClient(options) {
   this.requests = [];
   this.id = 0;
   this.queue = [];
-  this.connected = false;
+  this.isConnected = false;
   this.events = {};
 
   if(options.url){
@@ -17,9 +17,12 @@ function ChatClient(options) {
 }
 
 ChatClient.prototype = {
-    connect(url){
+    connect(url, cb){
 
       var chatClient = this;
+      if(chatClient.options.log){
+        console.log('chat-client - connecting socket');
+      }
       if(chatClient.socket){
         chatClient.socket.close();
       }
@@ -30,17 +33,28 @@ ChatClient.prototype = {
 
       socket.onopen = function(){
 
-        chatClient.connected = true;
+        if(chatClient.options.log){
+          console.log('chat-client - socket opened');
+        }
+        chatClient.isConnected = true;
         if(onOpen) onOpen(socket);
-        chatClient.queue.map(cb => cb());
-        chatClient.queue.length = 0;
+        if(cb) cb(socket);
+        if(chatClient.queue.length){
+          chatClient.queue.map(cb => cb());
+          chatClient.queue.length = 0;
+        }
         chatClient.emit('open');
 
       };
 
+
+
       socket.onclose = function(){
 
-        chatClient.connected = false;
+        if(chatClient.options.log){
+          console.log('chat-client - socket closing');
+        }
+        chatClient.isConnected = false;
         if(onClose) onClose(socket);
         chatClient.emit('close');
 
@@ -48,7 +62,10 @@ ChatClient.prototype = {
 
       socket.onerror = function(){
 
-        chatClient.connected = false;
+        if(chatClient.options.log){
+          console.log('chat-client - error:', json);
+        }
+        chatClient.isConnected = false;
         if(onError) onError(socket);
         chatClient.emit('error');
 
@@ -57,6 +74,9 @@ ChatClient.prototype = {
       socket.onmessage = function(msg){
 
         var json = JSON.parse(msg.data);
+        if(chatClient.options.log){
+          console.log('chat-client - got:', json);
+        }
         if(json.type) { // emit an event with the name of the action.
           chatClient.emit(json.type, json.data);
         }
@@ -65,9 +85,15 @@ ChatClient.prototype = {
           for (var i = 0; i < requests.length; i++) {
             if(requests[i].id === json.id){
               if(json.error) {
+                if(chatClient.options.log){
+                  console.log('chat-client - rejecting promise', json.error);
+                }
                 requests[i].promise.reject(json.error);
               }
               else {
+                if(chatClient.options.log){
+                  console.log('chat-client - resolving promise', json.data);
+                }
                 requests[i].promise.resolve(json.data);
               }
               requests.splice(i, 1);
@@ -75,11 +101,20 @@ ChatClient.prototype = {
             }
           }
         }
-        chatClient.emit('message', msg);  // in any case, emit a generic 'message' event.
+        chatClient.emit('message', json);  // in any case, emit a generic 'message' event.
 
       };
 
     },
+
+    close(){
+
+      if(this.socket){
+        this.socket.close();
+      }
+
+    },
+
     on(eventName, listener){  // add a listener to 'eventName', return false in listener to stop the event.
 
       var event = this.events[eventName];
@@ -112,6 +147,9 @@ ChatClient.prototype = {
     },
     emit(eventName, ...args){  // emit a named event
 
+      if(this.options.log){
+        console.log('chat-client - emitting ' + eventName, args);
+      }
       var cont, event = this.events[eventName];
       if (!event) return;
       for (var i = 0; i < event.listeners.length; i++) {
@@ -131,6 +169,10 @@ ChatClient.prototype = {
       var deffered = promise || q.defer();
       var stringified = JSON.stringify(request);
 
+      if(this.options.log){
+        console.log('chat-client - running server action ' + type, request);
+      }
+
       request.promise = deffered;
       deffered.promise.catch(this.options.onError || this.error);
 
@@ -142,7 +184,7 @@ ChatClient.prototype = {
     },
     whenOpened(cb){
 
-      if(!this.connected) return this.queue.push(cb);
+      if(!this.isConnected) return this.queue.push(cb);
       cb();
 
     },
